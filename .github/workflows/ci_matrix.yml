@@ -16,3 +16,8 @@ jobs:
           fetch-depth: 1
       - name: Make
         run: make
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-libs
+          path: path/**/*.so
