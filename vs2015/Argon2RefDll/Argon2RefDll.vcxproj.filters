@@ -56,10 +56,10 @@
     <ClCompile Include="..\..\src\encoding.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClInclude Include="..\..\src\ref.c">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClCompile Include="..\..\src\thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ref.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

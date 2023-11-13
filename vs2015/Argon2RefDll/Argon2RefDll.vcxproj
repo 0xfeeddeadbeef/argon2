@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{19D911A1-533C-4475-B313-F372481A35D4}</ProjectGuid>
     <RootNamespace>Argon2RefDll</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <!-- Set DefaultPlatformToolset to v100 (VS2010) if not defined -->
