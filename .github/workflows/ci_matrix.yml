@@ -16,13 +16,16 @@ jobs:
           fetch-depth: 1
       - name: Make x64
         if: ${{ success() && matrix.os == 'ubuntu-latest' }}
-        run: make
+        run: make libs
+      - name: 'Setup Visual C++'
+        if: ${{ success() && matrix.os == 'windows-latest' }}
+        uses: TheMrMilchmann/setup-msvc-dev@v3
       - name: MSBuild x64
         if: ${{ success() && matrix.os == 'windows-latest' }}
-        run: msbuild.exe "${{ env.GITHUB_WORKSPACE }}/Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=x64
+        run: msbuild.exe "$env:GITHUB_WORKSPACE\Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=x64
       - name: MSBuild x86
         if: ${{ success() && matrix.os == 'windows-latest' }}
-        run: msbuild.exe "${{ env.GITHUB_WORKSPACE }}/Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=Win32
+        run: msbuild.exe "$env:GITHUB_WORKSPACE\Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=Win32
       - name: Upload (Ubuntu)
         if: ${{ success() && matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
