@@ -6,7 +6,7 @@ jobs:
   Build-in-Matrix:
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     name: Build on ${{ matrix.os }}
     steps:
@@ -14,10 +14,24 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Make
+      - name: Make x64
+        if: ${{ success() && matrix.os == 'ubuntu-latest' }}
         run: make
-      - name: Upload
+      - name: MSBuild x64
+        if: ${{ success() && matrix.os == 'windows-latest' }}
+        run: msbuild.exe "${{ env.GITHUB_WORKSPACE }}/Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=x64
+      - name: MSBuild x86
+        if: ${{ success() && matrix.os == 'windows-latest' }}
+        run: msbuild.exe "${{ env.GITHUB_WORKSPACE }}/Argon2.sln" -t:Argon2OptDll:Build -p:Configuration=ReleaseStatic -p:Platform=Win32
+      - name: Upload (Ubuntu)
+        if: ${{ success() && matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
         with:
-          name: built-libs
-          path: '**/*.so.1'
+          name: built-libs-ubuntu
+          path: '${{ env.GITHUB_WORKSPACE }}/**/*.so.1'
+      - name: Upload (Windows)
+        if: ${{ success() && matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-libs-windows
+          path: '${{ env.GITHUB_WORKSPACE }}/vs2015/build/**/*.dll'
