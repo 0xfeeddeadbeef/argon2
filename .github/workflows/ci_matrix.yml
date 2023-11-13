@@ -20,4 +20,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: built-libs
-          path: **/*.so
+          path: '**/*.so'
