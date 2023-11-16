@@ -19,6 +19,7 @@
 #define ARGON2_THREAD_H
 
 #if !defined(ARGON2_NO_THREADS)
+#include <stdint.h>
 
 /*
         Here we implement an abstraction layer for the simpĺe requirements
