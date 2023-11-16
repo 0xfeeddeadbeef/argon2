@@ -25,6 +25,7 @@
 #endif
 
 #include "argon2.h"
+#include "encoding.h"
 
 static uint64_t rdtsc(void) {
 #ifdef _WIN32
@@ -105,7 +106,165 @@ static void benchmark() {
     }
 }
 
+#define ARRAYSIZE(A)  (sizeof(A)/sizeof((A)[0]))
+
+const static char pwdBytes[] = "P@$5w0rd";
+const static char saltBytes[] = { 0xFF, 0x02, 0x01, 0x0D, 0xFF, 0x02, 0x01, 0xAA, 0xBB, 0xFF, 0xEE, 0x11, 0x22, 0x11, 0x22, 0x33 };
+
 int main() {
-    benchmark();
-    return ARGON2_OK;
+    //benchmark();
+
+    const uint32_t t_cost = 5;
+    const uint32_t m_cost = 7168;
+    const uint32_t p_cost = 1;
+    const uint32_t hash_size = 32;
+    const uint32_t pwd_size = sizeof(pwdBytes);
+    const void* pwd = &pwdBytes[0];
+    const void* salt = &saltBytes[0];
+    uint32_t salt_size = sizeof(saltBytes);
+
+    printf_s("sizeof(pwdBytes)  => %zu\r\n", pwd_size);
+    printf_s("sizeof(saltBytes) => %zu\r\n", salt_size);
+
+    //
+    // Hashing
+    //
+
+    // enc_len includes terminating zero
+    size_t enc_len = argon2_encodedlen(t_cost, m_cost, p_cost, salt_size, hash_size, Argon2_id);
+    printf_s("argon2_encodedlen() -> %zu bytes\r\n", enc_len);
+    char* encoded = (char*)calloc(enc_len, sizeof(char));
+    if (NULL == encoded)
+    {
+        fprintf_s(stderr, "ERROR: Insufficient memory\r\n");
+        fflush(stderr);
+        return 1;
+    }
+
+    int arg_err = argon2id_hash_encoded(t_cost, m_cost, p_cost,
+                                        pwd, pwd_size,
+                                        salt, salt_size,
+                                        hash_size,
+                                        encoded, enc_len);
+    if (ARGON2_OK == arg_err)
+    {
+        printf_s("argon2id_hash_encoded() -> '%s'\r\n", encoded);
+    }
+    else
+    {
+        fprintf_s(stderr, "argon2_error_message() -> '%s'\r\n", argon2_error_message(arg_err));
+        fflush(stderr);
+    }
+
+    //
+    // Verification
+    //
+    arg_err = argon2id_verify(encoded, pwd, pwd_size);
+    if (ARGON2_OK == arg_err)
+    {
+        printf_s("argon2id_verify() -> 'OK'\r\n");
+    }
+    else
+    {
+        fprintf_s(stderr, "argon2_error_message() -> '%s'\r\n", argon2_error_message(arg_err));
+        fflush(stderr);
+    }
+
+    free((void*)encoded);
+
+    //
+    // Example: Using context, secret and additional data
+    //
+    uint8_t outHash[32]    = { 0 };
+    uint8_t secretData[16] = { 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
+    uint8_t addData[16]    = { 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32 };
+
+    printf_s("sizeof(outHash)       => %zu bytes\r\n", sizeof(outHash));
+    printf_s("ARRAYSIZE(outHash)    => %zu bytes\r\n", ARRAYSIZE(outHash));
+    printf_s("sizeof(secretData)    => %zu bytes\r\n", sizeof(secretData));
+    printf_s("ARRAYSIZE(secretData) => %zu bytes\r\n", ARRAYSIZE(secretData));
+    printf_s("sizeof(addData)       => %zu bytes\r\n", sizeof(addData));
+    printf_s("ARRAYSIZE(addData)    => %zu bytes\r\n", ARRAYSIZE(addData));
+
+    argon2_context* ctx = (argon2_context*)malloc(sizeof(argon2_context));
+    if (ctx) {
+        ctx->out          = outHash;
+        ctx->outlen       = sizeof(outHash);
+        ctx->pwd          = pwd;
+        ctx->pwdlen       = pwd_size;
+        ctx->salt         = salt;
+        ctx->saltlen      = salt_size;
+        ctx->secret       = secretData;
+        ctx->secretlen    = sizeof(secretData);
+        ctx->ad           = addData;
+        ctx->adlen        = sizeof(addData);
+        ctx->t_cost       = t_cost;
+        ctx->m_cost       = m_cost;
+        ctx->lanes        = p_cost;
+        ctx->threads      = p_cost;
+        ctx->version      = ARGON2_VERSION_13;
+        ctx->allocate_cbk = NULL;
+        ctx->free_cbk     = NULL;
+        ctx->flags        = ARGON2_DEFAULT_FLAGS;
+    }
+    else {
+        fprintf_s(stderr, "ERROR: Insufficient memory.\r\n");
+        fflush(stderr);
+        return 2;
+    }
+
+    arg_err = argon2id_ctx(ctx);
+    if (ARGON2_OK == arg_err)
+    {
+        char* ctx_encoded = (char*)calloc(enc_len, sizeof(char));
+        arg_err = encode_string(ctx_encoded, enc_len, ctx, Argon2_id);
+        if (arg_err == ARGON2_OK)
+        {
+            printf_s("argon2id_ctx() -> '%s'\r\n", ctx_encoded);
+        }
+        else
+        {
+            fprintf_s(stderr, "argon2_error_message() -> '%s'\r\n", argon2_error_message(arg_err));
+            fflush(stderr);
+        }
+        free((void*)ctx_encoded);
+    }
+    else
+    {
+        fprintf_s(stderr, "argon2_error_message() -> '%s'\r\n", argon2_error_message(arg_err));
+        fflush(stderr);
+    }
+
+    //
+    // Verify context
+    //
+
+    // BUG: Weird bahevior!!! secret and ad not taken into account when verifying
+    ctx->secret = NULL;
+    ctx->secretlen = 0U;
+    ctx->ad = NULL;
+    ctx->adlen = 0U;
+
+    ctx->pwd = NULL;
+    ctx->pwdlen = 0U;
+    //ctx->out = NULL;
+    //ctx->outlen = 0U;
+
+    //arg_err = argon2id_verify_ctx(ctx, outHash);
+    arg_err = argon2_verify_ctx(ctx, outHash, Argon2_id);
+    if (ARGON2_OK == arg_err)
+    {
+        printf_s("argon2id_verify_ctx() -> 'VERIFIED'\r\n");
+    }
+    else
+    {
+        fprintf_s(stderr, "argon2_error_message() -> '%s'\r\n", argon2_error_message(arg_err));
+        fflush(stderr);
+    }
+
+    free((void*)ctx);
+    int ch = getchar();
+
+    //return ARGON2_OK;
+    return arg_err;
 }
