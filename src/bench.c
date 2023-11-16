@@ -108,8 +108,8 @@ static void benchmark() {
 
 #define ARRAYSIZE(A)  (sizeof(A)/sizeof((A)[0]))
 
-const static char pwdBytes[] = "P@$5w0rd";
-const static char saltBytes[] = { 0xFF, 0x02, 0x01, 0x0D, 0xFF, 0x02, 0x01, 0xAA, 0xBB, 0xFF, 0xEE, 0x11, 0x22, 0x11, 0x22, 0x33 };
+static char pwdBytes[] = "P@$5w0rd";
+static char saltBytes[] = { 0xFF, 0x02, 0x01, 0x0D, 0xFF, 0x02, 0x01, 0xAA, 0xBB, 0xFF, 0xEE, 0x11, 0x22, 0x11, 0x22, 0x33 };
 
 int main() {
     //benchmark();
@@ -119,12 +119,9 @@ int main() {
     const uint32_t p_cost = 1;
     const uint32_t hash_size = 32;
     const uint32_t pwd_size = sizeof(pwdBytes);
-    const void* pwd = &pwdBytes[0];
-    const void* salt = &saltBytes[0];
+    void* pwd = &pwdBytes[0];
+    void* salt = &saltBytes[0];
     uint32_t salt_size = sizeof(saltBytes);
-
-    printf_s("sizeof(pwdBytes)  => %zu\r\n", pwd_size);
-    printf_s("sizeof(saltBytes) => %zu\r\n", salt_size);
 
     //
     // Hashing
