@@ -57,7 +57,8 @@ $(info Building without optimizations)
 	SRC += src/ref.c
 else
 $(info Building with optimizations for $(OPTTARGET))
-	CFLAGS += -march=$(OPTTARGET)
+#	CFLAGS += -march=$(OPTTARGET)
+	CFLAGS += -march=ivybridge
 	SRC += src/opt.c
 endif
 
