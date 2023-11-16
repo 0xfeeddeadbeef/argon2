@@ -23,6 +23,10 @@
 #define ARGON2_MIN_DECODED_SALT_LEN UINT32_C(8)
 #define ARGON2_MIN_DECODED_OUT_LEN UINT32_C(12)
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /*
 * encode an Argon2 hash string into the provided buffer. 'dst_len'
 * contains the size, in characters, of the 'dst' buffer; if 'dst_len'
@@ -31,8 +35,8 @@
 *
 * on success, ARGON2_OK is returned.
 */
-int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
-                  argon2_type type);
+ARGON2_PUBLIC int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
+                                argon2_type type);
 
 /*
 * Decodes an Argon2 hash string into the provided structure 'ctx'.
@@ -46,12 +50,16 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 *
 * Returned value is ARGON2_OK on success, other ARGON2_ codes on error.
 */
-int decode_string(argon2_context *ctx, const char *str, argon2_type type);
+ARGON2_PUBLIC int decode_string(argon2_context *ctx, const char *str, argon2_type type);
 
 /* Returns the length of the encoded byte stream with length len */
 size_t b64len(uint32_t len);
 
 /* Returns the length of the encoded number num */
 size_t numlen(uint32_t num);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif
