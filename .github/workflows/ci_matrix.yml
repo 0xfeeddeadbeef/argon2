@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: Make x64
-        if: ${{ success() && matrix.os == 'ubuntu-latest' }}
+        if: ${{ success() && matrix.os == 'ubuntu-20.04' }}
         run: make libs
       - name: 'Setup Visual C++'
         if: ${{ success() && matrix.os == 'windows-latest' }}
@@ -26,7 +26,7 @@ jobs:
         if: ${{ success() && matrix.os == 'windows-latest' }}
         run: msbuild.exe "$env:GITHUB_WORKSPACE\Argon2.sln" -t:Argon2OptDll -p:Configuration=ReleaseStatic -p:Platform=x64
       - name: Upload (Ubuntu)
-        if: ${{ success() && matrix.os == 'ubuntu-latest' }}
+        if: ${{ success() && matrix.os == 'ubuntu-20.04' }}
         uses: actions/upload-artifact@v3
         with:
           name: built-libs-ubuntu
