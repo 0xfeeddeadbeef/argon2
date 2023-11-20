@@ -109,7 +109,7 @@ static void fill_block(__m256i *state, const block *ref_block,
 #else
 static void fill_block(__m128i *state, const block *ref_block,
                        block *next_block, int with_xor) {
-    __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
+    __m128i block_XY[ARGON2_OWORDS_IN_BLOCK] = { 0 };
     unsigned int i;
 
     if (with_xor) {

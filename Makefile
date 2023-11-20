@@ -58,7 +58,7 @@ $(info Building without optimizations)
 else
 $(info Building with optimizations for $(OPTTARGET))
 #	CFLAGS += -march=$(OPTTARGET)
-	CFLAGS += -march=ivybridge -static-libstdc++ -static-libgcc
+	CFLAGS += -march=ivybridge -static-libgcc -nostdlib++
 	SRC += src/opt.c
 endif
 

@@ -6,7 +6,7 @@ jobs:
   Build-in-Matrix:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ 'ubuntu-20.04', 'windows-latest' ]
     runs-on: ${{ matrix.os }}
     name: Build on ${{ matrix.os }}
     steps:

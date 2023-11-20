@@ -89,7 +89,7 @@ int blake2b_init_param(blake2b_state *S, const blake2b_param *P) {
 
 /* Sequential blake2b initialization */
 int blake2b_init(blake2b_state *S, size_t outlen) {
-    blake2b_param P;
+    blake2b_param P = { 0 };
 
     if (S == NULL) {
         return -1;
@@ -118,7 +118,7 @@ int blake2b_init(blake2b_state *S, size_t outlen) {
 
 int blake2b_init_key(blake2b_state *S, size_t outlen, const void *key,
                      size_t keylen) {
-    blake2b_param P;
+    blake2b_param P = { 0 };
 
     if (S == NULL) {
         return -1;
@@ -164,8 +164,8 @@ int blake2b_init_key(blake2b_state *S, size_t outlen, const void *key,
 }
 
 static void blake2b_compress(blake2b_state *S, const uint8_t *block) {
-    uint64_t m[16];
-    uint64_t v[16];
+    uint64_t m[16] = { 0 };
+    uint64_t v[16] = { 0 };
     unsigned int i, r;
 
     for (i = 0; i < 16; ++i) {

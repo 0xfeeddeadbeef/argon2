@@ -40,7 +40,7 @@ int argon2_ctx(argon2_context *context, argon2_type type) {
     /* 1. Validate all inputs */
     int result = validate_inputs(context);
     uint32_t memory_blocks, segment_length;
-    argon2_instance_t instance;
+    argon2_instance_t instance = { 0 };
 
     if (ARGON2_OK != result) {
         return result;
@@ -104,7 +104,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
                 const size_t encodedlen, argon2_type type,
                 const uint32_t version){
 
-    argon2_context context;
+    argon2_context context = { 0 };
     int result;
     uint8_t *out;
 
@@ -249,7 +249,7 @@ static int argon2_compare(const uint8_t *b1, const uint8_t *b2, size_t len) {
 int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
                   argon2_type type) {
 
-    argon2_context ctx;
+    argon2_context ctx = { 0 };
     uint8_t *desired_result = NULL;
 
     int ret = ARGON2_OK;
