@@ -28,12 +28,19 @@ jobs:
       - name: 'MSBuild x64'
         if: ${{ success() && startsWith(matrix.os, 'windows') }}
         run: msbuild.exe "$env:GITHUB_WORKSPACE\Argon2.sln" -t:Argon2OptDll -p:Configuration=ReleaseStatic -p:Platform=x64
-      - name: 'List Output Binaries'
-        if: ${{ success() && !startsWith(matrix.os, 'windows') }}
+      - name: 'List Output Binaries (Ubuntu)'
+        if: ${{ success() && startsWith(matrix.os, 'ubuntu') }}
         run: |-
           shopt -s globstar
           set +e
+          echo $PWD
           ls -la -R **/libargon*.so*
+      - name: 'List Output Binaries (MacOS)'
+        if: ${{ success() && startsWith(matrix.os, 'macos') }}
+        run: |-
+          shopt -s globstar
+          set +e
+          echo $PWD
           ls -la -R **/libargon*.dylib*
       - name: 'Upload (Ubuntu)'
         if: ${{ success() && startsWith(matrix.os, 'ubuntu') }}
