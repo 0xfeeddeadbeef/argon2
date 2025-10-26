@@ -37,11 +37,10 @@ jobs:
           ls -la -R **/libargon*.so*
       - name: 'List Output Binaries (MacOS)'
         if: ${{ success() && startsWith(matrix.os, 'macos') }}
+        shell: pwsh
         run: |-
-          shopt -s globstar
-          set +e
-          echo $PWD
-          ls -la -R **/libargon*.dylib*
+          Write-Output "Current directory: $PWD"
+          Get-ChildItem '**/libargon*.dylib*' -Recurse | Select-Object -ExpandProperty 'FullName'
       - name: 'Upload (Ubuntu)'
         if: ${{ success() && startsWith(matrix.os, 'ubuntu') }}
         uses: actions/upload-artifact@v5
