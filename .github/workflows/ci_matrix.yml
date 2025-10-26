@@ -46,16 +46,16 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: built-libs-ubuntu
-          path: '**/*.so.1'
+          path: '${{ env.GITHUB_WORKSPACE }}/libargon2.so.1'
       - name: 'Upload (Windows)'
         if: ${{ success() && startsWith(matrix.os, 'windows') }}
         uses: actions/upload-artifact@v5
         with:
           name: built-libs-windows
-          path: 'vs2015/build/**/*.dll'
+          path: '${{ env.GITHUB_WORKSPACE }}/vs2015/build/**/*.dll'
       - name: 'Upload (MacOS)'
         if: ${{ success() && startsWith(matrix.os, 'macos') }}
         uses: actions/upload-artifact@v5
         with:
           name: built-libs-macos
-          path: '**/*.dylib'
+          path: '${{ env.GITHUB_WORKSPACE }}/libargon2.1.dylib'
