@@ -6,34 +6,43 @@ jobs:
   Build-in-Matrix:
     strategy:
       matrix:
-        os: [ 'ubuntu-20.04', 'windows-latest' ]
+        os: [ 'ubuntu-22.04', 'windows-2022', 'macos-14' ]
     runs-on: ${{ matrix.os }}
     name: Build on ${{ matrix.os }}
     steps:
-      - name: Clone
-        uses: actions/checkout@v4
+      - name: 'Clone'
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
-      - name: Make x64
-        if: ${{ success() && matrix.os == 'ubuntu-20.04' }}
+      - name: 'Make (Ubuntu)'
+        if: ${{ success() && startsWith(matrix.os, 'ubuntu') }}
+        run: make libs
+      - name: 'Make (MacOS)'
+        if: ${{ success() && startsWith(matrix.os, 'macos') }}
         run: make libs
       - name: 'Setup Visual C++'
-        if: ${{ success() && matrix.os == 'windows-latest' }}
-        uses: TheMrMilchmann/setup-msvc-dev@v3
+        if: ${{ success() && startsWith(matrix.os, 'windows') }}
+        uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
-      - name: MSBuild x64
-        if: ${{ success() && matrix.os == 'windows-latest' }}
+      - name: 'MSBuild x64'
+        if: ${{ success() && startsWith(matrix.os, 'windows') }}
         run: msbuild.exe "$env:GITHUB_WORKSPACE\Argon2.sln" -t:Argon2OptDll -p:Configuration=ReleaseStatic -p:Platform=x64
-      - name: Upload (Ubuntu)
-        if: ${{ success() && matrix.os == 'ubuntu-20.04' }}
-        uses: actions/upload-artifact@v3
+      - name: 'Upload (Ubuntu)'
+        if: ${{ success() && startsWith(matrix.os, 'ubuntu') }}
+        uses: actions/upload-artifact@v5
         with:
           name: built-libs-ubuntu
           path: '**/*.so.1'
-      - name: Upload (Windows)
-        if: ${{ success() && matrix.os == 'windows-latest' }}
-        uses: actions/upload-artifact@v3
+      - name: 'Upload (Windows)'
+        if: ${{ success() && startsWith(matrix.os, 'windows') }}
+        uses: actions/upload-artifact@v5
         with:
           name: built-libs-windows
           path: 'vs2015/build/**/*.dll'
+      - name: 'Upload (MacOS)'
+        if: ${{ success() && startsWith(matrix.os, 'macos') }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: built-libs-macos
+          path: '**/*.dylib'
