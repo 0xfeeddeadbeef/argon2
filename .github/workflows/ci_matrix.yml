@@ -32,6 +32,7 @@ jobs:
         if: ${{ success() && !startsWith(matrix.os, 'windows') }}
         run: |-
           shopt -s globstar
+          set +e
           ls -la -R **/libargon*.so*
           ls -la -R **/libargon*.dylib*
       - name: 'Upload (Ubuntu)'
